@@ -18,6 +18,7 @@ docker exec -it symfony_php bash
 ### Run the course command
 ```php bin/console app:check-currency-rates```
 ```text 
-You can add the integer number of you threshold,
-it is optional parameter, to skip it press ENTER the default value is 5%
+You can add the integer value for your threshold. 
+It is an optional parameter, to skip it, press ENTER. 
+The default value is 5%.
 ```
