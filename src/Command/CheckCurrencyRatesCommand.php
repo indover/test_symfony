@@ -87,8 +87,6 @@ class CheckCurrencyRatesCommand extends Command
             throw new InvalidArgumentException('The parameter must be a valid integer.');
         }
 
-        $threshold = (int)$threshold;
-
         if (!empty($threshold) && $threshold < 0) {
             throw new InvalidArgumentException('The parameter must be greater than or equal to zero.');
         }
