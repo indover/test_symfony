@@ -26,7 +26,7 @@ readonly class SmsNotification implements NotificationInterface
     {
         try {
             $this->twilioClient->messages->create(
-                "+351929046366",
+                "+380631122345",
                 [
                     "body" => $message,
                     "from" => $this->fromTwilioNumber,
