@@ -67,16 +67,14 @@ class CheckCurrencyRatesCommand extends Command
             BankCurrencyRateService::PRIVAT_BANK_URL
         );
 
-        $message = $this->bankCurrencyRateService->getMessage(
-            $this->bankCurrencyRateService->compareRates($privat, $mono, $threshold)
-        );
+        $result = $this->bankCurrencyRateService->compareRates($privat, $mono, $threshold);
 
-        if (str_starts_with($message, "The exchange")) {
+        if ($result->getIsChanged()) {
             // send SMS notification as default
-            $this->notification->send($message);
+            $this->notification->send($result->getMessage());
         }
 
-        $io->info($message);
+        $io->info($result->getMessage());
 
         return Command::SUCCESS;
     }
