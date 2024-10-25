@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Currency\CurrencyRateProviderInterface;
+use App\DTO\ThresholdCheckResult;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
@@ -56,10 +57,10 @@ readonly class BankCurrencyRateService implements CurrencyRateProviderInterface
         return $currencyCodes[$ccy];
     }
 
-    public function compareRates($privat, $mono, $threshold): array
+    public function compareRates($privat, $mono, $threshold): ThresholdCheckResult
     {
-        $messages = [];
-
+        $message = [];
+        $isChanged = false;
         foreach ($privat as $privatRate) {
             foreach ($mono as $monoRate) {
                 $privatCurrencyCode = $this->getCurrencyCode($privatRate['ccy']);
@@ -67,24 +68,18 @@ readonly class BankCurrencyRateService implements CurrencyRateProviderInterface
                     $privatBuy = floatval($privatRate['buy']);
                     $monoBuy = floatval($monoRate['rateBuy']);
 
-                    if (abs($privatBuy - $monoBuy) >= $threshold) {
-                        $messages[] = "The exchange rate difference for currency {$privatRate['ccy']}: PrivatBank ($privatBuy), Monobank ($monoBuy)";
-                    } else {
-                        $messages[] = "The rates are the same or the difference is insignificant.";
+                    if (abs($monoBuy - $privatBuy) >= $threshold) {
+                        $message[] = "The exchange rate difference for currency {$privatRate['ccy']}: PrivatBank ($privatBuy), Monobank ($monoBuy)";
+                        $isChanged = true;
                     }
                 }
             }
         }
 
-        return $messages;
-    }
-
-    public function getMessage(array $messages): string
-    {
-        if (str_starts_with($messages[0], "The rates")) {
-            return array_shift($messages);
-        } else {
-            return implode(PHP_EOL, $messages);
+        if (!$isChanged) {
+            $message[] = "The rates are the same or the difference is insignificant.";
         }
+
+        return new ThresholdCheckResult($isChanged, $threshold, $message);
     }
 }
