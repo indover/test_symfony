@@ -4,5 +4,5 @@ namespace App\Currency;
 
 interface CurrencyRateProviderInterface
 {
-    public function getRate(string $bankAPIUrl): array;
+    public function getRate(string $bankAPIUrl);
 }
